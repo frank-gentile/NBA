@@ -356,5 +356,5 @@ def getT2(n_clicks,players1,players2):
 
 
 
-# if __name__ == '__main__':
-#     app.run_server(debug=True)
+if __name__ == '__main__':
+    app.run_server(debug=True)
