@@ -1,4 +1,4 @@
-import dash  # (version 1.12.0) pip install dash
+import dash  
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -10,9 +10,10 @@ import requests
 import bs4 as bs
 from scipy.stats import ttest_ind
 
-
+#this function finds makes the url for a group or indiv player
 def formatLinks(player_names,year):
     links = []
+    # First link takes you to Antonio Davis, may need to id other special players 
     special = ['Anthony Davis']
 
     if type(player_names)==str:
@@ -37,18 +38,20 @@ def formatLinks(player_names,year):
             links.append(link)
     return(links)
 
-
+#this function scrapes the formatted url
 def getPlayerData(link):
     resp = requests.get(link)
     soup = bs.BeautifulSoup(resp.content,'lxml')
+    #find the datatable
     tables = soup.findAll('table')
     html = resp.text
-    soup = bs.BeautifulSoup(html, 'lxml')
+    #find the profile picture
     links = soup.find_all('img')
     pic = links[1]['src']
     table = tables[-1]
     points = []
     table_headers = []
+    #land on the right table
     for tx in table.findAll('th'):
         table_headers.append(tx.text)
         if len(table_headers)==30:
@@ -62,6 +65,7 @@ def getPlayerData(link):
             for obs in row.findAll('td'):
                 dummy = obs.text
                 line.append(dummy)
+                #keep games they did not play in 
                 if line[-1]=="Did Not Play" or line[-1]=='Inactive' or line[-1]=='Did Not Dress':
                     zeroes = [0]*29
                     zeroes[:len(line)-1] = line[:-1]
@@ -80,6 +84,7 @@ def getPlayerData(link):
     player_data = player_data.drop(player_data.columns[3],axis=1)
     return player_data, pic
 
+#custom for this league
 def getFantasyPoints(player_data):
     player_data['FPoints'] = 0
     
@@ -101,7 +106,7 @@ def getFantasyPoints(player_data):
             -int(row['TOV'])+int(row['PTS'])+5*dd+10*td+1000*qd
     return player_data
 
-
+#start webapp
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 application = app.server
 app.title = 'Nooice Trade Analysis'
@@ -310,7 +315,7 @@ def getT2(n_clicks,players1,players2):
         reject = 'was not statistically different.'
         proceed = 'Should your trade be accepted it will be automatically processed.'
 
-
+    #create a plot with the players points, simple moving average, and 67th and 33rd percentile
     fig = go.Scatter(x=x.index,y=x,name='Points')
     fig2 = go.Scatter(x=x.index,y=x.rolling(5,min_periods=1).mean(),name='Moving Average',line=dict(color='rgba(0,100,80,1)'))
     fig3 = go.Scatter(
