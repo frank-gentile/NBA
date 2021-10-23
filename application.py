@@ -1,4 +1,4 @@
-import dash  
+import dash  # (version 1.12.0) pip install dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -9,11 +9,11 @@ import pandas as pd
 import requests
 import bs4 as bs
 from scipy.stats import ttest_ind
+from espn_api.basketball import League
 
-#this function finds makes the url for a group or indiv player
+
 def formatLinks(player_names,year):
     links = []
-    # First link takes you to Antonio Davis, may need to id other special players 
     special = ['Anthony Davis']
 
     if type(player_names)==str:
@@ -38,20 +38,18 @@ def formatLinks(player_names,year):
             links.append(link)
     return(links)
 
-#this function scrapes the formatted url
+
 def getPlayerData(link):
     resp = requests.get(link)
     soup = bs.BeautifulSoup(resp.content,'lxml')
-    #find the datatable
     tables = soup.findAll('table')
     html = resp.text
-    #find the profile picture
+    soup = bs.BeautifulSoup(html, 'lxml')
     links = soup.find_all('img')
     pic = links[1]['src']
     table = tables[-1]
     points = []
     table_headers = []
-    #land on the right table
     for tx in table.findAll('th'):
         table_headers.append(tx.text)
         if len(table_headers)==30:
@@ -65,7 +63,6 @@ def getPlayerData(link):
             for obs in row.findAll('td'):
                 dummy = obs.text
                 line.append(dummy)
-                #keep games they did not play in 
                 if line[-1]=="Did Not Play" or line[-1]=='Inactive' or line[-1]=='Did Not Dress':
                     zeroes = [0]*29
                     zeroes[:len(line)-1] = line[:-1]
@@ -84,7 +81,28 @@ def getPlayerData(link):
     player_data = player_data.drop(player_data.columns[3],axis=1)
     return player_data, pic
 
-#custom for this league
+def getTeams():
+    league_id = 18927521
+
+    league = League(league_id=league_id,year=2022)
+    teams = []
+    for team in league.teams:
+        teams.append(team.team_name)
+
+    
+    return teams
+
+team_names = getTeams()
+
+def getPlayersFromTeam(team_i):
+    league_id = 18927521
+    league = League(league_id=league_id,year=2022)
+    player_list = []
+    for i in range(14):
+        player_name = league.teams[team_i].roster[i].name
+        player_list.append(player_name)
+    return [{'label': i, 'value': i} for i in player_list]
+
 def getFantasyPoints(player_data):
     player_data['FPoints'] = 0
     
@@ -106,7 +124,7 @@ def getFantasyPoints(player_data):
             -int(row['TOV'])+int(row['PTS'])+5*dd+10*td+1000*qd
     return player_data
 
-#start webapp
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 application = app.server
 app.title = 'Nooice Trade Analysis'
@@ -119,7 +137,7 @@ app.layout = dbc.Container([
         dbc.Row(dbc.Col(dcc.Markdown(
             '''Hello and welcome! This tool was developed to help justify and test potential trades for fantasy basketball.
             You can start with entering a player's name to view their stats, fantasy points and moving averages, then enter 
-            a trade to perform a two sample t test for equivalence. If the p-valye is greater than 0.10, there is not enough evidence to
+            a trade to perform a two sample t test for equivalence. If the p-value is greater than 0.10, there is not enough evidence to
             reject the null that they are statistically different. If such a trade were to be accepted, it would be automatically approved.
             Enjoy!
             '''
@@ -148,8 +166,8 @@ app.layout = dbc.Container([
                 html.Div([
                     dcc.Dropdown(id="slct_dataset",
                         options=[
-                            {"label": "Show all (press update button)", "value": 1},
-                            {"label": "Show 5","value":0}],
+                            {"label": "Show all", "value": 1},
+                            {"label": "Show last 5","value":0}],
                         multi=False,
                         value=0,
                         style={'width': "60%"}
@@ -161,21 +179,53 @@ app.layout = dbc.Container([
         html.Br(),
 
         dbc.Row(dbc.Col(html.H3("Two Sample t test"),width={'size':'auto'}),align='center',justify='center'),
-        dbc.Row(
+        # dbc.Row(
+        #     dbc.Col([
+        #         html.Div([
+
+                        
+        #                 ])],align='center',width={'size':5}
+        #     )),
+        dbc.Row([
             dbc.Col([
-                html.Label('Team1 players (separate by commas)= '),
-                dcc.Input(id='1players',value='Nikola Vucevic, Julius Randle',style={'width':'50%'}),
-                ],width=12),align='center',justify='center'),
-        dbc.Row(
-            dbc.Col([
-                html.Label('Team2 players (separate by commas) = '),
-                dcc.Input(id='2players',value='Giannis Antetokounmpo, Luka Doncic',style={'width':'50%'}),
-                ],width=12),align='center',justify='center'),
-        html.Br(),
-        dbc.Row(
-            dbc.Col(
-                dbc.Button('Update', id='submit-val2', n_clicks=0,color='primary'),width=12
-        ),align='center',justify='center'),
+                dcc.Dropdown(id='slct_team',
+                 options=[{'label': i, 'value': team_names.index(i)} for i in team_names],
+                        multi=False,
+                        value=0,
+                        style={'width': "60%"}
+                        ),
+                 dcc.Dropdown(id='player_list',
+                        multi=True,
+                        style={'width': "60%"}
+                        ),
+                    ],width={'size':6}),
+
+                dbc.Col([
+
+                dcc.Dropdown(id='slct_team2',
+                 options=[{'label': i, 'value': team_names.index(i)} for i in team_names],
+                        multi=False,
+                        value=1,
+                        style={'width': "60%"}
+                        ),
+                dcc.Dropdown(id='player_list2',
+                        multi=True,
+                        style={'width': "60%"}
+                        ),
+                
+                        ],width={'size':6})
+        ]),
+        # dbc.Row(
+        #     dbc.Col([
+        #         html.Div([
+        #          ])],align='center',width={'size':5}
+        #     )),
+        # dbc.Row(
+        #     dbc.Col([
+        #         html.Div([
+
+        #                 ])],align='center',width={'size':5}
+        #     )),
 
         html.Br(),
 
@@ -201,14 +251,13 @@ app.layout = dbc.Container([
 @app.callback([Output(component_id='Prof_pic', component_property='src'),
                Output("update_table", "children"),
                Output(component_id='Point_graph', component_property='figure')],
-     [Input('submit-val','n_clicks')],
-     state=[State('player_names','value'),
-            State('slct_dataset','value')])
+     [Input('submit-val','n_clicks'),
+      Input('slct_dataset','value')],
+     state=[State('player_names','value')])
 
-def getPic(n_clicks,player_names,table_opt):
-    link = formatLinks(player_names, 2021)
+def getPic(n_clicks,table_opt,player_names):
+    link = formatLinks(player_names, 2022)
     points = []
-
     player_data, pic = getPlayerData(link)
     df = getFantasyPoints(player_data)
 
@@ -280,20 +329,34 @@ def getPic(n_clicks,player_names,table_opt):
 
     return pic,table , fig
 
+@app.callback([Output('player_list','options'),
+               Output('player_list2','options')],
+               [Input('slct_team','value'),
+                Input('slct_team2','value')])
+def updatePlayers(team_i,team_i2):
+    return getPlayersFromTeam(team_i), getPlayersFromTeam(team_i2)
+
+@app.callback([Output('player_list','value'),
+               Output('player_list2','value')],
+               [Input('player_list','options'),
+                Input('player_list2','options')])
+def setPlayers(team_i,team_i2):
+    return [team_i[0]['value'],team_i[1]['value']], [team_i2[0]['value'],team_i2[1]['value']]
+
 @app.callback([Output('ttest','children'),
                Output('team1graph','figure'),
                Output('team2graph','figure')], 
-     [Input('submit-val2','n_clicks')],
-     state=[State('1players','value'),
-            State('2players','value')])
+     [Input('player_list','value'),
+      Input('player_list2','value')])
 
-def getT2(n_clicks,players1,players2):
-    team1 = players1.split(", ")
-    team2 = players2.split(", ")
+def getT2(team_i, team_i2):
+    team1 = team_i
+    team2 = team_i2
+
 
     player_names = team1 + team2
 
-    links = formatLinks(player_names, 2021)
+    links = formatLinks(player_names, 2022)
     points = []
     for link in links: 
         player_data, pic = getPlayerData(link)
@@ -315,7 +378,7 @@ def getT2(n_clicks,players1,players2):
         reject = 'was not statistically different.'
         proceed = 'Should your trade be accepted it will be automatically processed.'
 
-    #create a plot with the players points, simple moving average, and 67th and 33rd percentile
+
     fig = go.Scatter(x=x.index,y=x,name='Points')
     fig2 = go.Scatter(x=x.index,y=x.rolling(5,min_periods=1).mean(),name='Moving Average',line=dict(color='rgba(0,100,80,1)'))
     fig3 = go.Scatter(
@@ -356,7 +419,7 @@ def getT2(n_clicks,players1,players2):
 
 
     return '''{} simulated trade of {} for {} {} The pvalue was determined to be {}. {}'''.format(
-        congrats,players1,players2,reject,str(round(pval,2)),proceed), figure, figure2
+        congrats,team_i,team_i2,reject,str(round(pval,2)),proceed), figure, figure2
 
 
 
