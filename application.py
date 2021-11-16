@@ -125,7 +125,7 @@ def getFantasyPoints(player_data):
     return player_data
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE])
 application = app.server
 app.title = 'Nooice Trade Analysis'
 suppress_callback_exceptions=True
