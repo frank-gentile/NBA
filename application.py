@@ -125,7 +125,7 @@ def getFantasyPoints(player_data):
     return player_data
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SLATE])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 application = app.server
 app.title = 'Nooice Trade Analysis'
 suppress_callback_exceptions=True
@@ -134,7 +134,7 @@ app.layout = dbc.Container([
         html.Br(),
         dbc.Row(dbc.Col(html.H1("Nooice Trade Analysis Tool"),width={'size':'auto'}),align='center',justify='center'),
         html.Br(),
-        dbc.Row(dbc.Col(dcc.Markdown(
+        dbc.Row(dbc.Col(html.H6(
             '''Hello and welcome! This tool was developed to help justify and test potential trades for fantasy basketball.
             You can start with entering a player's name to view their stats, fantasy points and moving averages, then enter 
             a trade to perform a two sample t test for equivalence. If the p-value is greater than 0.10, there is not enough evidence to
@@ -229,7 +229,7 @@ app.layout = dbc.Container([
 
         html.Br(),
 
-        dbc.Row(dbc.Col(html.Div(id='ttest',children=[]),
+        dbc.Row(dbc.Col(html.H6(id='ttest',children=[]),
             ),justify='center',align='center'),
         
         html.Br(),
@@ -265,7 +265,7 @@ def getPic(n_clicks,table_opt,player_names):
     fig2 = go.Scatter(x=df.index,y=df['FPoints'].rolling(5,min_periods=1).mean(),name='Moving Average',line=dict(color='rgba(0,100,80,1)'))
     fig3 = go.Scatter(
         x=list(df.index)+list(df.index)[::-1],
-        y=list(df['FPoints'].rolling(5,min_periods=1).quantile(0.67))+list(df['FPoints'].rolling(5,min_periods=1).quantile(0.33)),
+        y=list(df['FPoints'].rolling(5,min_periods=1).mean()+df['FPoints'].std())+list(df['FPoints'].rolling(5,min_periods=1).mean()-df['FPoints'].std()),
         fill='toself',
         fillcolor='rgba(0,100,80,0.2)',
         line=dict(color='rgba(0,100,80,0)'),
@@ -306,7 +306,7 @@ def getPic(n_clicks,table_opt,player_names):
         table = html.Div(
             [
                 dash_table.DataTable(
-                    data=df.head(5).to_dict("rows"),
+                    data=df.tail(5).to_dict("rows"),
                     columns=[{"id": x, "name": x} for x in df.columns],
                                 style_table={'display': 'block', 'max-width': '600px', 'border': '2px grey',
                                                 },
@@ -383,7 +383,7 @@ def getT2(team_i, team_i2):
     fig2 = go.Scatter(x=x.index,y=x.rolling(5,min_periods=1).mean(),name='Moving Average',line=dict(color='rgba(0,100,80,1)'))
     fig3 = go.Scatter(
         x=list(x.index)+list(x.index)[::-1],
-        y=list(x.rolling(5,min_periods=1).quantile(0.67))+list(x.rolling(5,min_periods=1).quantile(0.33)),
+        y=list(x.rolling(5,min_periods=1).mean()+x.std())+list(x.rolling(5,min_periods=1).mean()-x.std()),
         fill='toself',
         fillcolor='rgba(0,100,80,0.2)',
         line=dict(color='rgba(0,100,80,0)'),
@@ -402,7 +402,7 @@ def getT2(team_i, team_i2):
     fig2 = go.Scatter(x=y.index,y=y.rolling(5,min_periods=1).mean(),name='Moving Average',line=dict(color='rgba(0,100,80,1)'))
     fig3 = go.Scatter(
         x=list(y.index)+list(y.index)[::-1],
-        y=list(y.rolling(5,min_periods=1).quantile(0.67))+list(y.rolling(5,min_periods=1).quantile(0.33)),
+        y=list(y.rolling(5,min_periods=1).mean()+y.std())+list(y.rolling(5,min_periods=1).mean()-y.std()),
         fill='toself',
         fillcolor='rgba(0,100,80,0.2)',
         line=dict(color='rgba(0,100,80,0)'),
