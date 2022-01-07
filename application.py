@@ -1,9 +1,9 @@
 import dash  # (version 1.12.0) pip install dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
-import dash_table
+from dash import dash_table
 import plotly.graph_objs as go
 import pandas as pd
 import requests
@@ -14,7 +14,8 @@ from espn_api.basketball import League
 
 def formatLinks(player_names,year):
     links = []
-    special = ['Anthony Davis']
+    special = ['Anthony Davis','Jaren Jackson Jr.']
+    
 
     if type(player_names)==str:
         first_name = player_names.split(" ")[0]
@@ -25,6 +26,9 @@ def formatLinks(player_names,year):
         links = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'01/gamelog/'+str(year)
         if player_names in special:
             links = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'02/gamelog/'+str(year)
+        if player_names == 'Robert Williams III':
+            links = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'04/gamelog/'+str(year)
+
     else:
         for player in player_names:
             first_name = player.split(" ")[0]
@@ -35,6 +39,9 @@ def formatLinks(player_names,year):
             link = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'01/gamelog/'+str(year)
             if player in special:
                 link = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'02/gamelog/'+str(year)
+            if player == 'Robert Williams III':
+                link = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'04/gamelog/'+str(year)
+
             links.append(link)
     return(links)
 
@@ -233,6 +240,10 @@ app.layout = dbc.Container([
             ),justify='center',align='center'),
         
         html.Br(),
+        dbc.Row(
+            dbc.Col(
+                dbc.Button('Run test', id='submit-val2', n_clicks=0,color='primary'),width=12
+        ),align='center',justify='center'),
 
         dbc.Row(
             dbc.Col(
@@ -251,9 +262,9 @@ app.layout = dbc.Container([
 @app.callback([Output(component_id='Prof_pic', component_property='src'),
                Output("update_table", "children"),
                Output(component_id='Point_graph', component_property='figure')],
-     [Input('submit-val','n_clicks'),
-      Input('slct_dataset','value')],
-     state=[State('player_names','value')])
+     [Input('submit-val','n_clicks')],
+      [State('slct_dataset','value'),
+      State('player_names','value')])
 
 def getPic(n_clicks,table_opt,player_names):
     link = formatLinks(player_names, 2022)
@@ -346,10 +357,11 @@ def setPlayers(team_i,team_i2):
 @app.callback([Output('ttest','children'),
                Output('team1graph','figure'),
                Output('team2graph','figure')], 
-     [Input('player_list','value'),
-      Input('player_list2','value')])
+     [Input('submit-val2','n_clicks'),],
+      [State('player_list','value'),
+      State('player_list2','value')])
 
-def getT2(team_i, team_i2):
+def getT2(n_clicks,team_i, team_i2):
     team1 = team_i
     team2 = team_i2
 
