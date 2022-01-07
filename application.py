@@ -157,13 +157,13 @@ app.layout = dbc.Container([
                 html.Label('Player = '),
                 dcc.Input(id='player_names',value='Stephen Curry'),
                 ],width=12),align='center',justify='center'),
-        dbc.Row(
-            dbc.Col(
-                dbc.Button('Update', id='submit-val', n_clicks=0,color='primary'),width=12
-        ),align='center',justify='center'),
+        # dbc.Row(
+        #     dbc.Col(
+        #         dbc.Button('Update', id='submit-val', n_clicks=0,color='primary'),width=12
+        # ),align='center',justify='center'),
         dbc.Row(
             [dbc.Col(
-                html.Img(id='Prof_pic',n_clicks=0),width={'size':2},align='left'),
+                html.Img(id='Prof_pic'),width={'size':2},align='left'),
             dbc.Col(
                 [dcc.Graph(id='Point_graph', figure={})],width={'size':10},align='right')],align='center',justify='center'),
 
@@ -257,9 +257,8 @@ app.layout = dbc.Container([
 @app.callback([Output(component_id='Prof_pic', component_property='src'),
                Output("update_table", "children"),
                Output(component_id='Point_graph', component_property='figure')],
-     [Input('submit-val','n_clicks')],
-      [State('slct_dataset','value'),
-      State('player_names','value')])
+      [Input('slct_dataset','value'),
+      Input('player_names','value')])
 
 def getPic(n_clicks,table_opt,player_names):
     link = formatLinks(player_names, 2022)
