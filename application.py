@@ -1,4 +1,3 @@
-import dash  # (version 1.12.0) pip install dash
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
