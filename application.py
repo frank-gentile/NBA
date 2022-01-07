@@ -1,5 +1,6 @@
-from dash import Dash 
-from dash import dcc, html, dash_table
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
@@ -130,7 +131,7 @@ def getFantasyPoints(player_data):
     return player_data
 
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 application = app.server
 app.title = 'Nooice Trade Analysis'
 suppress_callback_exceptions=True
@@ -287,7 +288,7 @@ def getPic(n_clicks,table_opt,player_names):
     if table_opt==1:
         table = html.Div(
             [
-                dash_table.DataTable(
+                dash.dash_table.DataTable(
                     data=df.to_dict("rows"),
                     columns=[{"id": x, "name": x} for x in df.columns],
                                 style_table={'display': 'block', 'max-width': '600px', 'border': '2px grey',
@@ -310,7 +311,7 @@ def getPic(n_clicks,table_opt,player_names):
     elif table_opt==0:
         table = html.Div(
             [
-                dash_table.DataTable(
+                dash.dash_table.DataTable(
                     data=df.tail(5).to_dict("rows"),
                     columns=[{"id": x, "name": x} for x in df.columns],
                                 style_table={'display': 'block', 'max-width': '600px', 'border': '2px grey',
