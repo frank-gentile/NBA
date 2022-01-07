@@ -1,4 +1,5 @@
 import dash
+import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -185,13 +186,6 @@ app.layout = dbc.Container([
         html.Br(),
 
         dbc.Row(dbc.Col(html.H3("Two Sample t test"),width={'size':'auto'}),align='center',justify='center'),
-        # dbc.Row(
-        #     dbc.Col([
-        #         html.Div([
-
-                        
-        #                 ])],align='center',width={'size':5}
-        #     )),
         dbc.Row([
             dbc.Col([
                 dcc.Dropdown(id='slct_team',
@@ -221,17 +215,6 @@ app.layout = dbc.Container([
                 
                         ],width={'size':6})
         ]),
-        # dbc.Row(
-        #     dbc.Col([
-        #         html.Div([
-        #          ])],align='center',width={'size':5}
-        #     )),
-        # dbc.Row(
-        #     dbc.Col([
-        #         html.Div([
-
-        #                 ])],align='center',width={'size':5}
-        #     )),
 
         html.Br(),
 
@@ -284,7 +267,7 @@ def getPic(table_opt,player_names):
     if table_opt==1:
         table = html.Div(
             [
-                dash.dash_table.DataTable(
+                dash_table.DataTable(
                     data=df.to_dict("rows"),
                     columns=[{"id": x, "name": x} for x in df.columns],
                                 style_table={'display': 'block', 'max-width': '600px', 'border': '2px grey',
@@ -307,7 +290,7 @@ def getPic(table_opt,player_names):
     elif table_opt==0:
         table = html.Div(
             [
-                dash.dash_table.DataTable(
+                dash_table.DataTable(
                     data=df.tail(5).to_dict("rows"),
                     columns=[{"id": x, "name": x} for x in df.columns],
                                 style_table={'display': 'block', 'max-width': '600px', 'border': '2px grey',
