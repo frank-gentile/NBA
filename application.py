@@ -1,5 +1,9 @@
-import dash
+from dash import Dash
+import dash_core_components as dcc
+import dash_html_components as html
 import dash_bootstrap_components as dbc
+from dash.dependencies import Input, Output, State
+from dash import dash_table
 import plotly.graph_objs as go
 import pandas as pd
 import requests
@@ -128,16 +132,16 @@ def getFantasyPoints(player_data):
     return player_data
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
+app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 application = app.server
 app.title = 'Nooice Trade Analysis'
 suppress_callback_exceptions=True
 
 app.layout = dbc.Container([
-        dash.html.Br(),
-        dbc.Row(dbc.Col(dash.html.H1("Nooice Trade Analysis Tool"),width={'size':'auto'}),align='center',justify='center'),
-        dash.html.Br(),
-        dbc.Row(dbc.Col(dash.html.H6(
+        html.Br(),
+        dbc.Row(dbc.Col(html.H1("Nooice Trade Analysis Tool"),width={'size':'auto'}),align='center',justify='center'),
+        html.Br(),
+        dbc.Row(dbc.Col(html.H6(
             '''Hello and welcome! This tool was developed to help justify and test potential trades for fantasy basketball.
             You can start with entering a player's name to view their stats, fantasy points and moving averages, then enter 
             a trade to perform a two sample t test for equivalence. If the p-value is greater than 0.10, there is not enough evidence to
@@ -148,11 +152,11 @@ app.layout = dbc.Container([
 
 
 
-        dash.html.Br(),
+        html.Br(),
         dbc.Row(
             dbc.Col([
-                dash.html.Label('Player = '),
-                dash.dcc.Input(id='player_names',value='Stephen Curry'),
+                html.Label('Player = '),
+                dcc.Input(id='player_names',value='Stephen Curry'),
                 ],width=12),align='center',justify='center'),
         dbc.Row(
             dbc.Col(
@@ -160,14 +164,14 @@ app.layout = dbc.Container([
         ),align='center',justify='center'),
         dbc.Row(
             [dbc.Col(
-                dash.html.Img(id='Prof_pic',n_clicks=0),width={'size':2},align='left'),
+                html.Img(id='Prof_pic',n_clicks=0),width={'size':2},align='left'),
             dbc.Col(
-                [dash.dcc.Graph(id='Point_graph', figure={})],width={'size':10},align='right')],align='center',justify='center'),
+                [dcc.Graph(id='Point_graph', figure={})],width={'size':10},align='right')],align='center',justify='center'),
 
         dbc.Row([
             dbc.Col(
-                dash.html.Div([
-                    dash.dcc.Dropdown(id="slct_dataset",
+                html.Div([
+                    dcc.Dropdown(id="slct_dataset",
                         options=[
                             {"label": "Show all", "value": 1},
                             {"label": "Show last 5","value":0}],
@@ -176,12 +180,12 @@ app.layout = dbc.Container([
                         style={'width': "60%"}
                         )]),align='center',width={'size':5})]),
 
-        dbc.Row(dbc.Col(dash.html.Div(id='update_table')),justify='center',align='center'),
+        dbc.Row(dbc.Col(html.Div(id='update_table')),justify='center',align='center'),
 
-        dash.html.Br(),
-        dash.html.Br(),
+        html.Br(),
+        html.Br(),
 
-        dbc.Row(dbc.Col(dash.html.H3("Two Sample t test"),width={'size':'auto'}),align='center',justify='center'),
+        dbc.Row(dbc.Col(html.H3("Two Sample t test"),width={'size':'auto'}),align='center',justify='center'),
         # dbc.Row(
         #     dbc.Col([
         #         html.Div([
@@ -191,13 +195,13 @@ app.layout = dbc.Container([
         #     )),
         dbc.Row([
             dbc.Col([
-                dash.dcc.Dropdown(id='slct_team',
+                dcc.Dropdown(id='slct_team',
                  options=[{'label': i, 'value': team_names.index(i)} for i in team_names],
                         multi=False,
                         value=0,
                         style={'width': "60%"}
                         ),
-                 dash.dcc.Dropdown(id='player_list',
+                 dcc.Dropdown(id='player_list',
                         multi=True,
                         style={'width': "60%"}
                         ),
@@ -205,13 +209,13 @@ app.layout = dbc.Container([
 
                 dbc.Col([
 
-                dash.dcc.Dropdown(id='slct_team2',
+                dcc.Dropdown(id='slct_team2',
                  options=[{'label': i, 'value': team_names.index(i)} for i in team_names],
                         multi=False,
                         value=1,
                         style={'width': "60%"}
                         ),
-                dash.dcc.Dropdown(id='player_list2',
+                dcc.Dropdown(id='player_list2',
                         multi=True,
                         style={'width': "60%"}
                         ),
@@ -230,18 +234,19 @@ app.layout = dbc.Container([
         #                 ])],align='center',width={'size':5}
         #     )),
 
-        dash.html.Br(),
+        html.Br(),
 
-        dbc.Row(dbc.Col(dash.html.H6(id='ttest',children=[]),
+        dbc.Row(dbc.Col(html.H6(id='ttest',children=[]),
             ),justify='center',align='center'),
         
-        dash.html.Br(),
+        html.Br(),
+
         dbc.Row(
             dbc.Col(
-                [dash.dcc.Graph(id='team1graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
+                [dcc.Graph(id='team1graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
         dbc.Row(
             dbc.Col(
-                [dash.dcc.Graph(id='team2graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
+                [dcc.Graph(id='team2graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
 
 
 
@@ -250,12 +255,12 @@ app.layout = dbc.Container([
  ])
     
 
-@app.callback([dash.dependencies.Output(component_id='Prof_pic', component_property='src'),
-               dash.dependencies.Output("update_table", "children"),
-               dash.dependencies.Output(component_id='Point_graph', component_property='figure')],
-     [dash.dependencies.Input('submit-val','n_clicks')],
-      [dash.dependencies.State('slct_dataset','value'),
-      dash.dependencies.State('player_names','value')])
+@app.callback([Output(component_id='Prof_pic', component_property='src'),
+               Output("update_table", "children"),
+               Output(component_id='Point_graph', component_property='figure')],
+     [Input('submit-val','n_clicks')],
+      [State('slct_dataset','value'),
+      State('player_names','value')])
 
 def getPic(n_clicks,table_opt,player_names):
     link = formatLinks(player_names, 2022)
@@ -282,9 +287,9 @@ def getPic(n_clicks,table_opt,player_names):
     fig = go.Figure(line)
 
     if table_opt==1:
-        table = dash.html.Div(
+        table = html.Div(
             [
-                dash.dash_table.DataTable(
+                dash_table.DataTable(
                     data=df.to_dict("rows"),
                     columns=[{"id": x, "name": x} for x in df.columns],
                                 style_table={'display': 'block', 'max-width': '600px', 'border': '2px grey',
@@ -305,9 +310,9 @@ def getPic(n_clicks,table_opt,player_names):
             ]
         )
     elif table_opt==0:
-        table = dash.html.Div(
+        table = html.Div(
             [
-                dash.dash_table.DataTable(
+                dash_table.DataTable(
                     data=df.tail(5).to_dict("rows"),
                     columns=[{"id": x, "name": x} for x in df.columns],
                                 style_table={'display': 'block', 'max-width': '600px', 'border': '2px grey',
@@ -331,25 +336,25 @@ def getPic(n_clicks,table_opt,player_names):
 
     return pic,table , fig
 
-@app.callback([dash.dependencies.Output('player_list','options'),
-               dash.dependencies.Output('player_list2','options')],
-               [dash.dependencies.Input('slct_team','value'),
-                dash.dependencies.Input('slct_team2','value')])
+@app.callback([Output('player_list','options'),
+               Output('player_list2','options')],
+               [Input('slct_team','value'),
+                Input('slct_team2','value')])
 def updatePlayers(team_i,team_i2):
     return getPlayersFromTeam(team_i), getPlayersFromTeam(team_i2)
 
-@app.callback([dash.dependencies.Output('player_list','value'),
-               dash.dependencies.Output('player_list2','value')],
-               [dash.dependencies.Input('player_list','options'),
-                dash.dependencies.Input('player_list2','options')])
+@app.callback([Output('player_list','value'),
+               Output('player_list2','value')],
+               [Input('player_list','options'),
+                Input('player_list2','options')])
 def setPlayers(team_i,team_i2):
     return [team_i[0]['value'],team_i[1]['value']], [team_i2[0]['value'],team_i2[1]['value']]
 
-@app.callback([dash.dependencies.Output('ttest','children'),
-               dash.dependencies.Output('team1graph','figure'),
-               dash.dependencies.Output('team2graph','figure')],
-      [dash.dependencies.Input('player_list','value'),
-      dash.dependencies.Input('player_list2','value')])
+@app.callback([Output('ttest','children'),
+               Output('team1graph','figure'),
+               Output('team2graph','figure')],
+      [Input('player_list','value'),
+      Input('player_list2','value')])
 
 def getT2(team_i, team_i2):
     team1 = team_i
