@@ -1,9 +1,6 @@
-from dash import Dash
-from dash import dcc
-from dash import html
+import dash
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
-from dash import dash_table
 import plotly.graph_objs as go
 import pandas as pd
 import requests
@@ -132,16 +129,16 @@ def getFantasyPoints(player_data):
     return player_data
 
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 application = app.server
 app.title = 'Nooice Trade Analysis'
 suppress_callback_exceptions=True
 
 app.layout = dbc.Container([
-        html.Br(),
-        dbc.Row(dbc.Col(html.H1("Nooice Trade Analysis Tool"),width={'size':'auto'}),align='center',justify='center'),
-        html.Br(),
-        dbc.Row(dbc.Col(html.H6(
+        dash.html.Br(),
+        dbc.Row(dbc.Col(dash.html.H1("Nooice Trade Analysis Tool"),width={'size':'auto'}),align='center',justify='center'),
+        dash.html.Br(),
+        dbc.Row(dbc.Col(dash.html.H6(
             '''Hello and welcome! This tool was developed to help justify and test potential trades for fantasy basketball.
             You can start with entering a player's name to view their stats, fantasy points and moving averages, then enter 
             a trade to perform a two sample t test for equivalence. If the p-value is greater than 0.10, there is not enough evidence to
@@ -152,11 +149,11 @@ app.layout = dbc.Container([
 
 
 
-        html.Br(),
+        dash.html.Br(),
         dbc.Row(
             dbc.Col([
-                html.Label('Player = '),
-                dcc.Input(id='player_names',value='Stephen Curry'),
+                dash.html.Label('Player = '),
+                dash.dcc.Input(id='player_names',value='Stephen Curry'),
                 ],width=12),align='center',justify='center'),
         dbc.Row(
             dbc.Col(
@@ -164,14 +161,14 @@ app.layout = dbc.Container([
         ),align='center',justify='center'),
         dbc.Row(
             [dbc.Col(
-                html.Img(id='Prof_pic',n_clicks=0),width={'size':2},align='left'),
+                dash.html.Img(id='Prof_pic',n_clicks=0),width={'size':2},align='left'),
             dbc.Col(
-                [dcc.Graph(id='Point_graph', figure={})],width={'size':10},align='right')],align='center',justify='center'),
+                [dash.dcc.Graph(id='Point_graph', figure={})],width={'size':10},align='right')],align='center',justify='center'),
 
         dbc.Row([
             dbc.Col(
-                html.Div([
-                    dcc.Dropdown(id="slct_dataset",
+                dash.html.Div([
+                    dash.dcc.Dropdown(id="slct_dataset",
                         options=[
                             {"label": "Show all", "value": 1},
                             {"label": "Show last 5","value":0}],
@@ -180,12 +177,12 @@ app.layout = dbc.Container([
                         style={'width': "60%"}
                         )]),align='center',width={'size':5})]),
 
-        dbc.Row(dbc.Col(html.Div(id='update_table')),justify='center',align='center'),
+        dbc.Row(dbc.Col(dash.html.Div(id='update_table')),justify='center',align='center'),
 
-        html.Br(),
-        html.Br(),
+        dash.html.Br(),
+        dash.html.Br(),
 
-        dbc.Row(dbc.Col(html.H3("Two Sample t test"),width={'size':'auto'}),align='center',justify='center'),
+        dbc.Row(dbc.Col(dash.html.H3("Two Sample t test"),width={'size':'auto'}),align='center',justify='center'),
         # dbc.Row(
         #     dbc.Col([
         #         html.Div([
@@ -195,13 +192,13 @@ app.layout = dbc.Container([
         #     )),
         dbc.Row([
             dbc.Col([
-                dcc.Dropdown(id='slct_team',
+                dash.dcc.Dropdown(id='slct_team',
                  options=[{'label': i, 'value': team_names.index(i)} for i in team_names],
                         multi=False,
                         value=0,
                         style={'width': "60%"}
                         ),
-                 dcc.Dropdown(id='player_list',
+                 dash.dcc.Dropdown(id='player_list',
                         multi=True,
                         style={'width': "60%"}
                         ),
@@ -209,13 +206,13 @@ app.layout = dbc.Container([
 
                 dbc.Col([
 
-                dcc.Dropdown(id='slct_team2',
+                dash.dcc.Dropdown(id='slct_team2',
                  options=[{'label': i, 'value': team_names.index(i)} for i in team_names],
                         multi=False,
                         value=1,
                         style={'width': "60%"}
                         ),
-                dcc.Dropdown(id='player_list2',
+                dash.dcc.Dropdown(id='player_list2',
                         multi=True,
                         style={'width': "60%"}
                         ),
@@ -234,18 +231,18 @@ app.layout = dbc.Container([
         #                 ])],align='center',width={'size':5}
         #     )),
 
-        html.Br(),
+        dash.html.Br(),
 
-        dbc.Row(dbc.Col(html.H6(id='ttest',children=[]),
+        dbc.Row(dbc.Col(dash.html.H6(id='ttest',children=[]),
             ),justify='center',align='center'),
         
-        html.Br(),
+        dash.html.Br(),
         dbc.Row(
             dbc.Col(
-                [dcc.Graph(id='team1graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
+                [dash.dcc.Graph(id='team1graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
         dbc.Row(
             dbc.Col(
-                [dcc.Graph(id='team2graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
+                [dash.dcc.Graph(id='team2graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
 
 
 
@@ -286,9 +283,9 @@ def getPic(n_clicks,table_opt,player_names):
     fig = go.Figure(line)
 
     if table_opt==1:
-        table = html.Div(
+        table = dash.html.Div(
             [
-                dash_table.DataTable(
+                dash.dash_table.DataTable(
                     data=df.to_dict("rows"),
                     columns=[{"id": x, "name": x} for x in df.columns],
                                 style_table={'display': 'block', 'max-width': '600px', 'border': '2px grey',
@@ -309,9 +306,9 @@ def getPic(n_clicks,table_opt,player_names):
             ]
         )
     elif table_opt==0:
-        table = html.Div(
+        table = dash.html.Div(
             [
-                dash_table.DataTable(
+                dash.dash_table.DataTable(
                     data=df.tail(5).to_dict("rows"),
                     columns=[{"id": x, "name": x} for x in df.columns],
                                 style_table={'display': 'block', 'max-width': '600px', 'border': '2px grey',
