@@ -1,6 +1,5 @@
 import dash
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
 import pandas as pd
 import requests
@@ -251,12 +250,12 @@ app.layout = dbc.Container([
  ])
     
 
-@app.callback([Output(component_id='Prof_pic', component_property='src'),
-               Output("update_table", "children"),
-               Output(component_id='Point_graph', component_property='figure')],
-     [Input('submit-val','n_clicks')],
-      [State('slct_dataset','value'),
-      State('player_names','value')])
+@app.callback([dash.dependencies.Output(component_id='Prof_pic', component_property='src'),
+               dash.dependencies.Output("update_table", "children"),
+               dash.dependencies.Output(component_id='Point_graph', component_property='figure')],
+     [dash.dependencies.Input('submit-val','n_clicks')],
+      [dash.dependencies.State('slct_dataset','value'),
+      dash.dependencies.State('player_names','value')])
 
 def getPic(n_clicks,table_opt,player_names):
     link = formatLinks(player_names, 2022)
@@ -332,25 +331,25 @@ def getPic(n_clicks,table_opt,player_names):
 
     return pic,table , fig
 
-@app.callback([Output('player_list','options'),
-               Output('player_list2','options')],
-               [Input('slct_team','value'),
-                Input('slct_team2','value')])
+@app.callback([dash.dependencies.Output('player_list','options'),
+               dash.dependencies.Output('player_list2','options')],
+               [dash.dependencies.Input('slct_team','value'),
+                dash.dependencies.Input('slct_team2','value')])
 def updatePlayers(team_i,team_i2):
     return getPlayersFromTeam(team_i), getPlayersFromTeam(team_i2)
 
-@app.callback([Output('player_list','value'),
-               Output('player_list2','value')],
-               [Input('player_list','options'),
-                Input('player_list2','options')])
+@app.callback([dash.dependencies.Output('player_list','value'),
+               dash.dependencies.Output('player_list2','value')],
+               [dash.dependencies.Input('player_list','options'),
+                dash.dependencies.Input('player_list2','options')])
 def setPlayers(team_i,team_i2):
     return [team_i[0]['value'],team_i[1]['value']], [team_i2[0]['value'],team_i2[1]['value']]
 
-@app.callback([Output('ttest','children'),
-               Output('team1graph','figure'),
-               Output('team2graph','figure')],
-      [Input('player_list','value'),
-      Input('player_list2','value')])
+@app.callback([dash.dependencies.Output('ttest','children'),
+               dash.dependencies.Output('team1graph','figure'),
+               dash.dependencies.Output('team2graph','figure')],
+      [dash.dependencies.Input('player_list','value'),
+      dash.dependencies.Input('player_list2','value')])
 
 def getT2(team_i, team_i2):
     team1 = team_i
