@@ -1,4 +1,5 @@
-from dash import Dash, dash_table, dcc, html
+from dash import Dash 
+from dash import dcc, html, dash_table
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
