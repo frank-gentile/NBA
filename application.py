@@ -1,3 +1,4 @@
+from dash import Dash
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
@@ -131,7 +132,7 @@ def getFantasyPoints(player_data):
     return player_data
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
+app = Dash(__name__, external_stylesheets=[dbc.themes.LITERA])
 application = app.server
 app.title = 'Nooice Trade Analysis'
 suppress_callback_exceptions=True
