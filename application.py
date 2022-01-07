@@ -260,7 +260,7 @@ app.layout = dbc.Container([
       [Input('slct_dataset','value'),
       Input('player_names','value')])
 
-def getPic(n_clicks,table_opt,player_names):
+def getPic(table_opt,player_names):
     link = formatLinks(player_names, 2022)
     points = []
     player_data, pic = getPlayerData(link)
