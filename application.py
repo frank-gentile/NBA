@@ -1,6 +1,4 @@
-from dash import Dash, dash_table
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import Dash, dash_table, dcc, html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 import plotly.graph_objs as go
