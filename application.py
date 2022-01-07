@@ -248,9 +248,6 @@ app.layout = dbc.Container([
                 [dcc.Graph(id='team2graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
 
 
-
-
-
  ])
     
 
