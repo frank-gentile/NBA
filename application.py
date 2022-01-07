@@ -242,11 +242,6 @@ app.layout = dbc.Container([
         html.Br(),
         dbc.Row(
             dbc.Col(
-                dbc.Button('Run test', id='submit-val2', n_clicks=0,color='primary'),width=12
-        ),align='center',justify='center'),
-
-        dbc.Row(
-            dbc.Col(
                 [dcc.Graph(id='team1graph', figure={})],width={'size':11},align='center'),align='center',justify='center'),
         dbc.Row(
             dbc.Col(
@@ -356,12 +351,11 @@ def setPlayers(team_i,team_i2):
 
 @app.callback([Output('ttest','children'),
                Output('team1graph','figure'),
-               Output('team2graph','figure')], 
-     [Input('submit-val2','n_clicks'),],
-      [State('player_list','value'),
-      State('player_list2','value')])
+               Output('team2graph','figure')],
+      [Input('player_list','value'),
+      Input('player_list2','value')])
 
-def getT2(n_clicks,team_i, team_i2):
+def getT2(team_i, team_i2):
     team1 = team_i
     team2 = team_i2
 
