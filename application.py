@@ -14,7 +14,8 @@ from espn_api.basketball import League
 
 def formatLinks(player_names,year):
     links = []
-    special = ['Anthony Davis','Jaren Jackson Jr.']
+    special = ['Anthony Davis','Jaren Jackson Jr.','Jaylen Brown','Harrison Barnes','Tobias Harris']
+    special4 =['Robert Williams III','Keldon Johnson']
     
 
     if type(player_names)==str:
@@ -26,8 +27,14 @@ def formatLinks(player_names,year):
         links = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'01/gamelog/'+str(year)
         if player_names in special:
             links = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'02/gamelog/'+str(year)
-        if player_names == 'Robert Williams III':
+        if player_names in special4:
             links = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'04/gamelog/'+str(year)
+        if player_names == "D'Angelo Russell":
+            links = 'https://www.basketball-reference.com/players/r/russeda01.html'
+        if player_names == 'Marcus Morris Sr.':
+            links = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'03/gamelog/'+str(year)
+        if player_names == "Clint Capela":
+            links = 'https://www.basketball-reference.com/players/c/capelca01/gamelog/'+str(year)
 
     else:
         for player in player_names:
@@ -39,12 +46,17 @@ def formatLinks(player_names,year):
             link = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'01/gamelog/'+str(year)
             if player in special:
                 link = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'02/gamelog/'+str(year)
-            if player == 'Robert Williams III':
+            if player in special4:
                 link = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'04/gamelog/'+str(year)
+            if player == "D'Angelo Russell":
+                link = 'https://www.basketball-reference.com/players/r/russeda01/gamelog/'+str(year)
+            if player == 'Marcus Morris Sr.':
+                link = 'https://www.basketball-reference.com/players/'+str(first_letter)+'/'+str(first_five)+str(first_two)+'03/gamelog/'+str(year)
+            if player == "Clint Capela":
+                link = 'https://www.basketball-reference.com/players/c/capelca01/gamelog/'+str(year)
 
             links.append(link)
     return(links)
-
 
 def getPlayerData(link):
     resp = requests.get(link)
